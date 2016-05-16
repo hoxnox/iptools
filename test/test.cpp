@@ -1,5 +1,5 @@
-/**@author $username$ <$usermail$>
- * @date $date$
+/**@author hoxnox <hoxnox@gmail.com>
+ * @date 20160516 09:09:55
  *
  * @brief iptools test launcher.*/
 
@@ -7,6 +7,8 @@
 #include <gtest/gtest.h>
 
 // test cases
+#include "test_cidr.hpp"
+#include "test_lpfst.hpp"
 
 int main(int argc, char *argv[])
 {

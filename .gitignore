@@ -1,4 +1,4 @@
 *.swp
 *.swo
 build
-src/$NULL$_config.h
+src/iptools_config.h

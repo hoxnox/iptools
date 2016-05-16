@@ -1,5 +1,5 @@
-# @author $username$ <$usermail$>
-# @date $date$
+# @author hoxnox <hoxnox@gmail.com>
+# @date 20160516 09:09:55
 # iptools cmake build script
 
 cmake_minimum_required(VERSION 2.6.4)
@@ -28,7 +28,8 @@ configure_file(
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}"
                       "${PROJECT_SOURCE_DIR}/cmake/Modules")
 
-include_directories("${PROJECT_SOURCE_DIR}/src")
+include_directories("${PROJECT_SOURCE_DIR}/include")
+add_definitions("-std=c++11")
 
 ########################################################################
 # tests and docs
@@ -61,7 +62,7 @@ SET(CPACK_PACKAGE_NAME iptools)
 #	SET(CPACK_RPM_PACKAGE_REQUIRES "libsomelib >= 1.1.1")
 #endif()
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "")
-SET(CPACK_PACKAGE_VENDOR "$uername$ <$usermail$>")
+SET(CPACK_PACKAGE_VENDOR "$uername$ <hoxnox@gmail.com>")
 SET(CPACK_PACKAGE_CONTACT ${CPACK_PACKAGE_VENDOR})
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.markdown")
 SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
