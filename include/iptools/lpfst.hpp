@@ -4,7 +4,7 @@
 #pragma once
 #include "cidr.hpp"
 
-namespace rators {
+namespace iptools {
 
 /**@brief Data structure allows to add some CIDR networks and check if
  * the given address belongs to any of them.
@@ -101,6 +101,39 @@ private:
 	}
 	node* root = nullptr;
 };
+
+inline lpfst
+internet_blacklist()
+{
+	lpfst result;
+	// RFC-1122: This host on this network
+	result.insert({"0.0.0.0/8"});
+	// RFC-6598: Shared address space
+	result.insert({"100.64.0.0/10"});
+	// RFC-3927: Link local
+	result.insert({"169.254.0.0/16"});
+	// RFC-1918: Private use
+	result.insert({"10.0.0.0/8"});
+	// RFC-1918: Private use
+	result.insert({"172.16.0.0/12"});
+	// RFC-6890: IETF Protocol Assignments
+	result.insert({"192.0.0.0/24"});
+	// RFC-5737: Documentation (TEST-NET-1)
+	result.insert({"192.0.2.0/24"});
+	// RFC-3068: 6to4 Relay Anycast
+	result.insert({"192.88.99.0/24"});
+	// RFC-1918: Private-Use
+	result.insert({"192.168.0.0/16"});
+	// RFC-2544: Benchmarking
+	result.insert({"192.18.0.0/15"});
+	// RFC-5737: Documentation (TEST-NET-2)
+	result.insert({"198.51.100.0/24"});
+	// RFC-5737: Documentation (TEST-NET-3)
+	result.insert({"203.0.113.0/24"});
+	// RFC-5771: Multicast, RFC-1112: Reserved, RFC-0919: Limited broadcast
+	result.insert({"224.0.0.0/3"});
+	return result;
+}
 
 } // namespace
 

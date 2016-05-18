@@ -3,7 +3,7 @@
 
 #include <iptools/lpfst.hpp>
 
-using namespace rators;
+using namespace iptools;
 
 TEST(test_lpfst, simple)
 {
@@ -61,5 +61,100 @@ TEST(test_lpfst, total_16)
 				EXPECT_FALSE(ipset.check(addr)) << addr;
 		 }
 	}
+}
+
+TEST(test_lpfst, internet_blacklist)
+{
+	lpfst inet_bl = internet_blacklist();
+
+	cidr_v4 full("0.0.0.0/0");
+	auto cur = full.begin();
+	while(inet_bl.check(*cur)) // 0.0.0.0/8
+		++cur;
+	EXPECT_TRUE(cidr_v4("1.0.0.0/0") == *cur) << *cur;
+
+	cur += (0x1000000*9 - 1);
+	EXPECT_TRUE(cidr_v4("9.255.255.255/0") == *cur) << *cur;
+	++cur;
+	while(inet_bl.check(*cur)) // 10.0.0.0/8
+		++cur;
+	EXPECT_TRUE(cidr_v4("11.0.0.0/0") == *cur) << *cur;
+
+	cur += (0x1000000*89 + 0x10000*64 - 1);
+	EXPECT_TRUE(cidr_v4("100.63.255.255/0") == *cur) << *cur;
+	++cur;
+	while(inet_bl.check(*cur)) // 100.64.0.0/10
+		++cur;
+	EXPECT_TRUE(cidr_v4("100.128.0.0/0") == *cur) << *cur;
+
+	cur += (0x1000000*69 + 0x10000*126 - 1);
+	EXPECT_TRUE(cidr_v4("169.253.255.255/0") == *cur) << *cur;
+	++cur;
+	while(inet_bl.check(*cur)) // 169.254.0.0/16
+		++cur;
+	EXPECT_TRUE(cidr_v4("169.255.0.0/0") == *cur) << *cur;
+
+	cur += (0x1000000*2 + 0x10000*17 - 1);
+	EXPECT_TRUE(cidr_v4("172.15.255.255/0") == *cur) << *cur;
+	++cur;
+	while(inet_bl.check(*cur)) // 172.16.0.0/12
+		++cur;
+	EXPECT_TRUE(cidr_v4("172.32.0.0/0") == *cur) << *cur;
+
+	cur += (0x1000000*19 + 0x10000*224 - 1);
+	EXPECT_TRUE(cidr_v4("191.255.255.255/0") == *cur) << *cur;
+	++cur;
+	while(inet_bl.check(*cur)) // 192.0.0.0/24
+		++cur;
+	EXPECT_TRUE(cidr_v4("192.0.1.0/0") == *cur) << *cur;
+
+	cur += 255;
+	EXPECT_TRUE(cidr_v4("192.0.1.255/0") == *cur) << *cur;
+	++cur;
+	while(inet_bl.check(*cur)) // 192.0.2.0/24
+		++cur;
+	EXPECT_TRUE(cidr_v4("192.0.3.0/0") == *cur) << *cur;
+
+	cur += (0x10000*17 + 0x100*252 + 255);
+	EXPECT_TRUE(cidr_v4("192.17.255.255/0") == *cur) << *cur;
+	++cur;
+	while(inet_bl.check(*cur)) // 192.18.0.0/15
+		++cur;
+	EXPECT_TRUE(cidr_v4("192.20.0.0/0") == *cur) << *cur;
+
+	cur += (0x10000*68 + 0x100*98 + 255);
+	EXPECT_TRUE(cidr_v4("192.88.98.255/0") == *cur) << *cur;
+	++cur;
+	while(inet_bl.check(*cur)) // 192.88.99.0/24
+		++cur;
+	EXPECT_TRUE(cidr_v4("192.88.100.0/0") == *cur) << *cur;
+
+	cur += (0x10000*79 + 0x100*155 + 255);
+	EXPECT_TRUE(cidr_v4("192.167.255.255/0") == *cur) << *cur;
+	++cur;
+	while(inet_bl.check(*cur)) // 192.88.99.0/24
+		++cur;
+	EXPECT_TRUE(cidr_v4("192.169.0.0/0") == *cur) << *cur;
+
+	cur += (0x1000000*5 +0x10000*138 + 0x100*99 + 255);
+	EXPECT_TRUE(cidr_v4("198.51.99.255/0") == *cur) << *cur;
+	++cur;
+	while(inet_bl.check(*cur)) // 198.51.100.0/24
+		++cur;
+	EXPECT_TRUE(cidr_v4("198.51.101.0/0") == *cur) << *cur;
+
+	cur += (0x1000000*4 +0x10000*205 + 0x100*11 + 255);
+	EXPECT_TRUE(cidr_v4("203.0.112.255/0") == *cur) << *cur;
+	++cur;
+	while(inet_bl.check(*cur)) // 203.0.113.0/24
+		++cur;
+	EXPECT_TRUE(cidr_v4("203.0.114.0/0") == *cur) << *cur;
+
+	cur += (0x1000000*20 +0x10000*255 + 0x100*141 + 255);
+	EXPECT_TRUE(cidr_v4("223.255.255.255/0") == *cur) << *cur;
+	++cur;
+	while(inet_bl.check(*cur) && cur != cidr_v4("0.0.0.0/0").end()) // 224.0.0.0/3
+		cur += 100;
+	EXPECT_TRUE(cur == cidr_v4("0.0.0.0/0").end()) << *cur;
 }
 
