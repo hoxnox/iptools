@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <string>
+#include <sstream>
 #include <algorithm>
 #include <memory>
 #include <arpa/inet.h>
