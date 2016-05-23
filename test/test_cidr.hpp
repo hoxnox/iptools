@@ -161,3 +161,5 @@ TEST(test_cidr_v4, iterator_moving_not_net)
 	EXPECT_TRUE(cidr_v4("1.0.0.1/8").end() == i);
 }
 
+// TODO: DISTANCE
+

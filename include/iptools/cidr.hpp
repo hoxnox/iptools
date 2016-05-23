@@ -84,7 +84,7 @@ namespace std
 		strm << (*i).str();
 		return strm;
 	}
-	typename iterator_traits<iptools::cidr_v4::const_iterator>::difference_type
+	inline typename iterator_traits<iptools::cidr_v4::const_iterator>::difference_type
 	distance (const iptools::cidr_v4::const_iterator& first,
 	          const iptools::cidr_v4::const_iterator& last)
 	{
@@ -279,8 +279,13 @@ cidr_v4::const_iterator::distance(const const_iterator& rhv) const
 	if (end_ != rhv.end_ || (mask_&127)!=(rhv.mask_&127))
 		return 0;
 	if (pos_ >= rhv.pos_)
-		return 0;
-	return rhv.pos_ - pos_;
+	{
+		if(!(mask_ & END_FLAG))
+			return 1;
+		else
+			return 0;
+	}
+	return rhv.pos_ - pos_ + 1;
 }
 
 } // namespace
