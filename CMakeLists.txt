@@ -16,7 +16,7 @@ option(WITH_DOCS  "Generate docs" OFF)
 project(iptools)
 
 set(iptools_VERSION_MAJOR 0)
-set(iptools_VERSION_MINOR 0)
+set(iptools_VERSION_MINOR 2)
 set(iptools_VERSION_PATCH 0)
 # configuration header
 configure_file(
