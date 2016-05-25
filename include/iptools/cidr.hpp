@@ -48,7 +48,7 @@ private:
 };
 
 class cidr_v4::const_iterator
-	: public std::iterator<std::random_access_iterator_tag, cidr_v4, uint32_t>
+	: public std::iterator<std::random_access_iterator_tag, cidr_v4, uint64_t>
 {
 public:
 	const_iterator() {}
@@ -61,7 +61,7 @@ public:
 	const_iterator&  operator+=(uint32_t n);
 	const_iterator   operator+(uint32_t n);
 	cidr_v4          operator*() const;
-	uint32_t         distance(const const_iterator& rhv) const;
+	uint64_t         distance(const const_iterator& rhv) const;
 private:
 	uint32_t pos_;
 	uint32_t end_;
@@ -273,7 +273,7 @@ cidr_v4::const_iterator::operator*() const
 	return cidr_v4(pos_, mask_);
 }
 
-inline uint32_t
+inline uint64_t
 cidr_v4::const_iterator::distance(const const_iterator& rhv) const
 {
 	if (end_ != rhv.end_ || (mask_&127)!=(rhv.mask_&127))
@@ -285,7 +285,7 @@ cidr_v4::const_iterator::distance(const const_iterator& rhv) const
 		else
 			return 0;
 	}
-	return rhv.pos_ - pos_ + 1;
+	return static_cast<uint64_t>(rhv.pos_) - pos_ + 1;
 }
 
 } // namespace
