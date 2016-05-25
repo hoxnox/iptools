@@ -89,8 +89,7 @@ TEST(test_cidr_v4, in)
 TEST(test_cidr_v4, iterator_simple)
 {
 	std::stringstream etalon;
-	etalon << "192.168.10.0/30" << std::endl
-	       << "192.168.10.1/30" << std::endl
+	etalon << "192.168.10.1/30" << std::endl
 	       << "192.168.10.2/30" << std::endl
 	       << "192.168.10.3/30" << std::endl;
 	std::stringstream result;
@@ -117,7 +116,7 @@ TEST(test_cidr_v4, iterator_last)
 	for (auto i : cidr_v4("255.255.255.255/32"))
 		result << i << std::endl;
 	EXPECT_EQ(etalon.str(), result.str());
-	auto last = cidr_v4("0.0.0.0/0").begin() + 0x1000000ULL*255 + 0x10000*255 + 0x100*255 + 255;
+	auto last = cidr_v4("0.0.0.0/0").begin() + (0x1000000ULL*255 + 0x10000*255 + 0x100*255 + 255 - 1);
 	EXPECT_TRUE(cidr_v4("255.255.255.255/0") == *last) << *last;
 	EXPECT_TRUE(last != cidr_v4("0.0.0.0/0").end());
 	++last;
@@ -127,8 +126,7 @@ TEST(test_cidr_v4, iterator_last)
 TEST(test_cidr_v4, iterator_first)
 {
 	std::stringstream etalon;
-	etalon << "0.0.0.0/31" << std::endl
-	       << "0.0.0.1/31" << std::endl;
+	etalon << "0.0.0.1/31" << std::endl;
 	std::stringstream result;
 	for (auto i : cidr_v4("0.0.0.0/31"))
 		result << i << std::endl;
@@ -146,10 +144,10 @@ TEST(test_cidr_v4, iterator_eq)
 TEST(test_cidr_v4, iterator_moving)
 {
 	auto i = cidr_v4("1.0.0.0/8").begin();
-	EXPECT_EQ(cidr_v4("1.0.0.10/8"), *(i+10));
-	EXPECT_EQ(cidr_v4("1.0.0.1/8"), *(++i));
-	EXPECT_EQ(cidr_v4("1.0.0.1/8"), *i++);
-	EXPECT_EQ(cidr_v4("1.0.0.2/8"), *i);
+	EXPECT_EQ(cidr_v4("1.0.0.10/8"), *(i+9));
+	EXPECT_EQ(cidr_v4("1.0.0.2/8"), *(++i));
+	EXPECT_EQ(cidr_v4("1.0.0.2/8"), *i++);
+	EXPECT_EQ(cidr_v4("1.0.0.3/8"), *i);
 }
 
 TEST(test_cidr_v4, iterator_moving_not_net)
@@ -163,7 +161,7 @@ TEST(test_cidr_v4, iterator_moving_not_net)
 
 TEST(test_cidr_v4, distance_whole)
 {
-	ASSERT_EQ(0x100000000UL, std::distance(cidr_v4("0.0.0.0/0").begin(),
+	ASSERT_EQ(0xffffffffUL, std::distance(cidr_v4("0.0.0.0/0").begin(),
 	                                       cidr_v4("0.0.0.0/0").end()));
 }
 

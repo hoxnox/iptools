@@ -170,7 +170,7 @@ cidr_v4::begin() const
 	}
 	else
 	{
-		begin.pos_ = first();
+		begin.pos_ = first() + 1;
 		begin.end_ = last();
 	}
 	begin.mask_ = 32-mask_;
