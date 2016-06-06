@@ -1,5 +1,5 @@
-# @author $username$ <$usermail$>
-# @date $date$
+# @author hoxnox <hoxnox@gmail.com>
+# @date 20160606 13:04:24
 # iptools cmake tests build script
 
 find_package(Threads)
@@ -52,6 +52,7 @@ if (NOT USE_SYSTEM_GTEST)
     set(GTEST_LIBRARIES ${BINARY_DIR}/libgtest.a)
 else ()
     find_package(GTest REQUIRED)
+    add_custom_target(gtestlib)
 endif()
 include_directories(${GTEST_INCLUDE_DIRS})
 list(APPEND LIBRARIES ${GTEST_LIBRARIES})

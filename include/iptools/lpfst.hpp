@@ -26,25 +26,27 @@ public:
 	}
 	bool check(const cidr_v4& addr) const
 	{
-		node* y = root;
-		uint8_t level = 0;
-		bool is_net = addr.is_net();
+		node*    y = root;
+		uint8_t  level = 0;
+		bool     is_net = addr.is_net();
+		uint32_t addr_i = (uint32_t)addr;
+		uint8_t  mask   = addr.mask();
 		while (y != nullptr)
 		{
+			uint32_t curr_pref = y->prefix>>(32-(y->len));
 			if (is_net)
 			{
-				if (addr.mask() < level)
+				if (mask < level)
 					return true;
-				if (((uint32_t)addr>>(32-(y->len))) == (y->prefix>>(32-(y->len)))
-				 && addr.mask() > y->len)
+				if ((addr_i>>(32-(y->len))) == curr_pref && mask > y->len)
 					return true;
 			}
 			else
 			{
-				if (((uint32_t)addr>>(32-(y->len))) == (y->prefix>>(32-(y->len))))
+				if ((addr_i>>(32-(y->len))) == curr_pref)
 					return true;
 			}
-			if ((((uint32_t)addr>>(31-level))&1) == 0)
+			if (((addr_i>>(31-level))&1) == 0)
 				y=y->left;
 			else
 				y=y->right;
