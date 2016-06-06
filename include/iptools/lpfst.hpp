@@ -33,20 +33,17 @@ public:
 		uint8_t  mask   = addr.mask();
 		while (y != nullptr)
 		{
-			uint32_t curr_pref = y->prefix>>(32-(y->len));
-			if (is_net)
+			if (is_net && mask < level)
+				return true;
+			if (!is_net || (is_net && mask >= y->len))
 			{
-				if (mask < level)
-					return true;
-				if ((addr_i>>(32-(y->len))) == curr_pref && mask > y->len)
+				uint32_t cmp_mask = ~0;
+				cmp_mask <<= 32-y->len;
+				//if ((addr_i>>(32-(y->len))) == y->prefix>>(32-(y->len)))
+				if ((addr_i&cmp_mask) == y->prefix)
 					return true;
 			}
-			else
-			{
-				if ((addr_i>>(32-(y->len))) == curr_pref)
-					return true;
-			}
-			if (((addr_i>>(31-level))&1) == 0)
+			if ((addr_i&(1<<(31-level))) == 0)
 				y=y->left;
 			else
 				y=y->right;
