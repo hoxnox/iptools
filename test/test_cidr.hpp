@@ -80,6 +80,7 @@ TEST(test_cidr_v4, net)
 
 TEST(test_cidr_v4, in)
 {
+	EXPECT_TRUE (cidr_v4("10.0.0.1/32").in(cidr_v4("10.0.0.0/24")));
 	EXPECT_TRUE (cidr_v4("127.0.0.1/24").in(cidr_v4("127.0.0.0/24")));
 	EXPECT_FALSE(cidr_v4("127.0.0.1/24").in(cidr_v4("127.0.0.2/24")));
 	EXPECT_TRUE (cidr_v4("127.0.0.1/24").in(cidr_v4("127.0.0.1/24")));
