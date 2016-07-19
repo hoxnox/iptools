@@ -151,12 +151,11 @@ cidr_v4::in(const cidr_v4& net) const
 {
 	if (!net.is_net())
 		return operator==(net);
-	if (is_net())
-	{
-		return mask_ > net.mask_ ?
-			false : ((addr_>>net.mask_)==(net.addr_>>net.mask_));
-	}
-	return (net.addr_>>mask_)==(addr_>>mask_);
+	if (mask_ > net.mask_)
+		return false;
+	uint32_t net_netaddr = addr_>>net.mask_;
+	uint32_t my_netaddr  = net.addr_>>net.mask_;
+	return net_netaddr == my_netaddr;
 }
 
 inline cidr_v4::const_iterator
