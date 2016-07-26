@@ -13,6 +13,11 @@ namespace iptools {
 class lpfst
 {
 public:
+
+	lpfst() {}
+	lpfst(const lpfst& copy) { root = recurse_copy(copy.root); }
+	lpfst& operator=(const lpfst& copy) { nodes.clear(); root = recurse_copy(copy.root); }
+
 	void
 	insert(cidr_v4 addr)
 	{
@@ -53,6 +58,12 @@ public:
 	}
 private:
 	struct node{
+		node(uint8_t len, uint32_t prefix)
+			: len(len > 32 ? 32 : len)
+			, prefix(prefix)
+			, left(nullptr)
+			, right(nullptr)
+		{ }
 		node(const cidr_v4& addr)
 			: len(addr.is_net() ? addr.mask() : 32)
 			, prefix(addr)
@@ -98,6 +109,18 @@ private:
 				insert(x, y->right, level + 1);
 		}
 	}
+	node*
+	recurse_copy(const node* n)
+	{
+		if (n == nullptr)
+			return nullptr;
+		nodes.emplace_back(new node(n->len, n->prefix));
+		node* new_node = nodes.back().get();
+		new_node->right = recurse_copy(n->right);
+		new_node->left = recurse_copy(n->left);
+		return new_node;
+	}
+
 	node* root = nullptr;
 };
 
