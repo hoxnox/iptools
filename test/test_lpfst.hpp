@@ -31,6 +31,36 @@ TEST(test_lpfst, simple)
 	EXPECT_FALSE(ipset.check({"192.168.1.1/24"   }));
 }
 
+TEST(test_lpfst, copy)
+{
+	std::unique_ptr<lpfst> ipset1(new lpfst);
+	ipset1->insert({"10.0.0.0/8"    });
+	ipset1->insert({"192.168.3.0/24"});
+	ipset1->insert({"127.0.0.1/24"  });
+	ipset1->insert({"10.0.2.0/24"   });
+	ipset1->insert({"213.1.2.0/24"  });
+	ipset1->insert({"215.1.2.0/24"  });
+
+	std::unique_ptr<lpfst> ipset2(new lpfst(*ipset1));
+	ipset1.reset(nullptr);
+
+	EXPECT_TRUE (ipset2->check({"215.1.2.1/24"     }));
+	EXPECT_TRUE (ipset2->check({"215.1.2.255/24"   }));
+	EXPECT_TRUE (ipset2->check({"215.1.2.255/8"    }));
+	EXPECT_FALSE(ipset2->check({"215.0.0.0/8"      }));
+	EXPECT_TRUE (ipset2->check({"10.0.0.1/24"      }));
+	EXPECT_TRUE (ipset2->check({"10.255.255.255/24"}));
+	EXPECT_TRUE (ipset2->check({"10.255.255.255/8" }));
+	EXPECT_TRUE (ipset2->check({"10.0.0.0/24"      }));
+	EXPECT_TRUE (ipset2->check({"213.1.2.1/24"     }));
+	EXPECT_FALSE(ipset2->check({"10.0.0.0/7"       }));
+	EXPECT_FALSE(ipset2->check({"10.0.0.0/7"       }));
+	EXPECT_FALSE(ipset2->check({"11.0.0.0/8"       }));
+	EXPECT_FALSE(ipset2->check({"192.168.1.1/8"    }));
+	EXPECT_FALSE(ipset2->check({"192.168.1.1/24"   }));
+}
+
+
 TEST(test_lpfst, total_16)
 {
 	lpfst ipset;
