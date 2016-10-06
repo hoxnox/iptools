@@ -3,6 +3,7 @@
 
 #pragma once
 #include "cidr.hpp"
+#include <vector>
 
 namespace iptools {
 
