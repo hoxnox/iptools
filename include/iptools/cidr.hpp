@@ -66,7 +66,7 @@ private:
 	uint32_t pos_;
 	uint32_t end_;
 	uint8_t  mask_; //!< @warning - it's normal mask
-	static const int8_t END_FLAG = 1<<7;
+	static const uint8_t END_FLAG = 1u<<7;
 friend class cidr_v4;
 };
 
