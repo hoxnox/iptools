@@ -7,8 +7,9 @@ cmake_minimum_required(VERSION 2.6.4)
 ########################################################################
 # options
 
-option(WITH_TESTS "Build tests."  OFF)
-option(WITH_DOCS  "Generate docs" OFF)
+option(WITH_TESTS    "Build tests."  OFF)
+option(WITH_DOCS     "Generate docs" OFF)
+option(WITH_WARNINGS "Turn on some more checks" OFF)
 
 ########################################################################
 # general
@@ -30,6 +31,15 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}"
 
 include_directories("${PROJECT_SOURCE_DIR}/include")
 add_definitions("-std=c++11")
+
+if(WITH_WARNINGS)
+	# Add warning flags
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wformat=2 -Wnon-virtual-dtor -Wcast-qual")
+	# Add warnings excluded
+	# -Wparentheses is ignored because Logger operators cannot be isolated with 'pragma ignored'
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused -Wno-unused-parameter -Wno-parentheses")
+endif()
+
 
 ########################################################################
 # tests and docs
