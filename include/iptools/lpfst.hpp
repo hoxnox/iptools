@@ -17,7 +17,8 @@ public:
 
 	lpfst() {}
 	lpfst(const lpfst& copy) { root = recurse_copy(copy.root); }
-	lpfst& operator=(const lpfst& copy) { nodes.clear(); root = recurse_copy(copy.root); }
+	lpfst& operator=(const lpfst& copy)
+		{ nodes.clear(); root = recurse_copy(copy.root); return *this; }
 
 	void
 	insert(cidr_v4 addr)
