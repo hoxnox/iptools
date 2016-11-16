@@ -31,6 +31,7 @@ public:
 		}
 		insert(nodes.back().get(), root, 0);
 	}
+    /**@return true if the address belongs any of the inserted CIDRs*/
 	bool check(const cidr_v4& addr) const
 	{
 		node*    y = root;
@@ -58,6 +59,31 @@ public:
 		}
 		return false;
 	}
+	/**@return true if the address belongs any of the inserted CIDRs
+     * @param addr in host byte order*/
+	bool check(const uint32_t addr) const
+	{
+		node*    y = root;
+		uint8_t  level = 0;
+        uint32_t addr_ = addr;
+		while (y != nullptr)
+		{
+			uint32_t cmp_mask = ~0;
+			cmp_mask <<= 32-y->len;
+			if ((addr_&cmp_mask) == y->prefix)
+				return true;
+			if ((addr_&(1<<(31-level))) == 0)
+				y=y->left;
+			else
+				y=y->right;
+			++level;
+		}
+		return false;
+	}
+
+	bool empty() const { return root == nullptr || nodes.empty(); }
+    void clear() { nodes.clear(); root = nullptr; }
+
 private:
 	struct node{
 		node(uint8_t len, uint32_t prefix)
