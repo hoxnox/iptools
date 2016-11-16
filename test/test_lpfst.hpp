@@ -5,15 +5,15 @@
 
 using namespace iptools;
 
-TEST(test_lpfst, simple)
+TEST(test_lpfst, simple_check_sidr)
 {
 	lpfst ipset;
 	ipset.insert({"10.0.0.0/8"    });
 	ipset.insert({"192.168.3.0/24"});
 	ipset.insert({"127.0.0.1/24"  });
 	ipset.insert({"10.0.2.0/24"   });
-	ipset.insert({"213.1.2.0/24"   });
-	ipset.insert({"215.1.2.0/24"   });
+	ipset.insert({"213.1.2.0/24"  });
+	ipset.insert({"215.1.2.0/24"  });
 
 	EXPECT_TRUE (ipset.check({"215.1.2.1/24"     }));
 	EXPECT_TRUE (ipset.check({"215.1.2.255/24"   }));
@@ -30,6 +30,50 @@ TEST(test_lpfst, simple)
 	EXPECT_FALSE(ipset.check({"192.168.1.1/8"    }));
 	EXPECT_FALSE(ipset.check({"192.168.1.1/24"   }));
 }
+
+TEST(test_lpfst, simple_check_uint32)
+{
+	lpfst ipset;
+	ipset.insert({"10.0.0.0/8"    });
+	ipset.insert({"192.168.3.0/24"});
+	ipset.insert({"127.0.0.1/24"  });
+	ipset.insert({"10.0.2.0/24"   });
+	ipset.insert({"213.1.2.0/24"  });
+	ipset.insert({"215.1.2.0/24"  });
+
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("215.1.2.1"     ))));
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("215.1.2.2"     ))));
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("215.1.2.255"   ))));
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("215.1.3.2"     ))));
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("10.0.0.1"      ))));
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("10.0.1.0"      ))));
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("10.255.255.255"))));
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("213.1.2.1"     ))));
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("11.0.0.1"      ))));
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.1.1"   ))));
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.2.1"   ))));
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("192.168.3.1"   ))));
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.4.1"   ))));
+}
+
+TEST(test_lpfst, empty)
+{
+	lpfst ipset;
+	EXPECT_TRUE(ipset.empty());
+	ipset.insert({"10.0.0.0/8"});
+	EXPECT_FALSE(ipset.empty());
+}
+
+TEST(test_lpfst, clear)
+{
+	lpfst ipset;
+	ipset.insert({"10.0.0.0/8"});
+	ipset.insert({"192.168.3.0/24"});
+	ipset.clear();
+	EXPECT_FALSE(ipset.check(inet_addr("10.0.0.1")));
+	EXPECT_TRUE(ipset.empty());
+}
+
 
 TEST(test_lpfst, copy)
 {

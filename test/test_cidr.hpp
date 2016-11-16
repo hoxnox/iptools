@@ -20,6 +20,13 @@ TEST(test_cidr_v4, localhost)
 	EXPECT_EQ(32, addr1.mask());
 }
 
+TEST(test_cidr_v4, byte_order)
+{
+	cidr_v4 addr(ntohl(inet_addr("127.0.0.0")), 24);
+	EXPECT_EQ(2130706432, (uint32_t)addr);
+	EXPECT_EQ(24, addr.mask());
+}
+
 TEST(test_cidr_v4, privateB)
 {
 	cidr_v4 addr("172.16.1.2/12");

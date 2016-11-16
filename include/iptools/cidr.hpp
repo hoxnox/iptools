@@ -17,6 +17,7 @@ class cidr_v4
 public:
 	cidr_v4() {}
 	cidr_v4(std::string str);
+	/**@param addr should be in host byte order*/
 	cidr_v4(uint32_t addr, uint8_t mask) : addr_(addr), mask_(32-mask) {}
 	~cidr_v4() = default;
 
@@ -25,9 +26,9 @@ public:
 	operator uint32_t() const { return addr_; }
 	uint32_t mask() const { return 32-mask_; }
 
-	/**@brief get first address (network address) in the network*/
+	/**@brief get first address (network address in host byte order) in the network*/
 	uint32_t    first() const { return (addr_>>mask_)<<mask_; }
-	/**@brief get last address in the network*/
+	/**@brief get last address in the network (host byte order)*/
 	uint32_t    last()  const;
 	/**@brief check if address is int the given cidr*/
 	bool        in(const cidr_v4& net) const;
