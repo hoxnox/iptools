@@ -3,7 +3,6 @@
 # iptools cmake tests build script
 
 find_package(Threads)
-list(APPEND LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
 
 function(add_gtests gtname sources)
     foreach(source ${sources})
@@ -56,6 +55,8 @@ else ()
 endif()
 include_directories(${GTEST_INCLUDE_DIRS})
 list(APPEND LIBRARIES ${GTEST_LIBRARIES})
+# pthread must be the last library after static libs
+list(APPEND LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
 
 set(TEST_UNIT_SRC
         test.cpp)
