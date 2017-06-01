@@ -17,8 +17,8 @@ option(WITH_WARNINGS "Turn on some more checks" OFF)
 project(iptools)
 
 set(iptools_VERSION_MAJOR 0)
-set(iptools_VERSION_MINOR 2)
-set(iptools_VERSION_PATCH 5)
+set(iptools_VERSION_MINOR 3)
+set(iptools_VERSION_PATCH 0)
 # configuration header
 configure_file(
 	"${PROJECT_SOURCE_DIR}/src/iptools_config.cfg"

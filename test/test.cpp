@@ -7,7 +7,8 @@
 #include <gtest/gtest.h>
 
 // test cases
-#include "test_cidr.hpp"
+#include "test_cidr_v4.hpp"
+#include "test_cidr_v6.hpp"
 #include "test_lpfst.hpp"
 
 int main(int argc, char *argv[])
