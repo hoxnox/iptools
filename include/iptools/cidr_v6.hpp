@@ -132,8 +132,8 @@ cidr_v6::in(const cidr_v6& net) const
 	}
 	if (bits > 0)
 	{
-		uint8_t net_netaddr = addr_[i]>>8-bits;
-		uint8_t my_netaddr  = net.addr_[i]>>8-bits;
+		uint8_t net_netaddr = addr_[i]>>(8-bits);
+		uint8_t my_netaddr  = net.addr_[i]>>(8-bits);
 		if (net_netaddr != my_netaddr)
 			return false;
 	}
