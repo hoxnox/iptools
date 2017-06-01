@@ -1,7 +1,7 @@
 /**@author hoxnox <hoxnox@gmail.com>
  * @date 20160405 11:39:23 */
 
-#include <iptools/cidr.hpp>
+#include <iptools/cidr_v4.hpp>
 #include <sstream>
 
 using namespace iptools;
