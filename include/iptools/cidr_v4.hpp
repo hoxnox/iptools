@@ -154,8 +154,8 @@ cidr_v4::in(const cidr_v4& net) const
 		return operator==(net);
 	if (mask_ > net.mask_)
 		return false;
-	uint32_t net_netaddr = addr_>>net.mask_;
-	uint32_t my_netaddr  = net.addr_>>net.mask_;
+	uint32_t net_netaddr = net.mask_ < 32 ? addr_>>net.mask_ : 0;
+	uint32_t my_netaddr  = net.mask_ < 32 ? net.addr_>>net.mask_ : 0;
 	return net_netaddr == my_netaddr;
 }
 
