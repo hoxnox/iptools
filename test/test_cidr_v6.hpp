@@ -88,6 +88,7 @@ TEST(test_cidr_v6, in)
 	EXPECT_FALSE(cidr_v6("::1/24").in(cidr_v6("::2/24")));
 	EXPECT_TRUE (cidr_v6("::1/24").in(cidr_v6("::1/24")));
 	EXPECT_TRUE (cidr_v6("::FFF8/125").net().in(cidr_v6("::FFF0/124")));
+	EXPECT_TRUE (cidr_v6("::1/24").in(cidr_v6("::0/0")));
 }
 
 
