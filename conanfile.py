@@ -4,7 +4,7 @@ from conans import tools, CMake
 class IpToolsConan(NxConanFile):
     name = "iptools"
     description = "Header only library of IP utilities. Uses features of C++11."
-    version = "0.3.1"
+    version = "0.3.2"
     options = {"noop":[True, False]}
     default_options = "noop=False"
     url = "https://github.com/hoxnox/iptools.git"
@@ -12,7 +12,7 @@ class IpToolsConan(NxConanFile):
     settings = "os", "compiler", "build_type", "arch"
 
     def do_source(self):
-        self.retrieve("3a64f5f0f75864ee582e3a14b03114eb50f3d7510d1f0010687a2e5e41ec299d",
+        self.retrieve("3a64f5f0f75864ee582e3a14b03114eb50f3d7510d1f0010687a2e5e41ec299d", # TOFIX
             [
                 'vendor://hoxnox/iptools/iptools-{version}.tar.gz'.format(version=self.version),
                 'https://github.com/hoxnox/iptools/archive/{version}.tar.gz'.format(version=self.version)
