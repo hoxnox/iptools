@@ -12,7 +12,7 @@ class IpToolsConan(NxConanFile):
     settings = "os", "compiler", "build_type", "arch"
 
     def do_source(self):
-        self.retrieve("3a64f5f0f75864ee582e3a14b03114eb50f3d7510d1f0010687a2e5e41ec299d", # TOFIX
+        self.retrieve("f1f5c0afdef75a7fb91582ba7e5908d6b8cca143befb59e49691cdeed3337aae",
             [
                 'vendor://hoxnox/iptools/iptools-{version}.tar.gz'.format(version=self.version),
                 'https://github.com/hoxnox/iptools/archive/{version}.tar.gz'.format(version=self.version)
