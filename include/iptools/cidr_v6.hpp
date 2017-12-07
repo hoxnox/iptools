@@ -81,7 +81,7 @@ cidr_v6::cidr_v6(std::string str)
 	}
 	if (inet_pton(AF_INET6, addr.c_str(), &addr_) != 1)
 	{
-		addr_ = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		addr_ = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 		return;
 	}
 }
