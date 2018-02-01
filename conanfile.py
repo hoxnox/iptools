@@ -1,5 +1,5 @@
 from nxtools import NxConanFile
-from conans import tools, CMake
+from conans import tools
 
 class IpToolsConan(NxConanFile):
     name = "iptools"
