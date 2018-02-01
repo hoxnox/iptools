@@ -6,7 +6,7 @@ username = os.getenv("CONAN_USERNAME", "hoxnox")
 
 class IpToolsTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
-    requires = "iptools/0.3.2@%s/%s" % (username, channel)
+    requires = "iptools/0.3.3@%s/%s" % (username, channel)
     generators = "cmake"
 
     def build(self):
