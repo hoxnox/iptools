@@ -107,6 +107,14 @@ TEST(test_cidr_v4, iterator_simple)
 	ASSERT_EQ(etalon.str(), result.str());
 }
 
+TEST(test_cidr_v4, iterate_first_internet_addr)
+{
+	cidr_v4 addr("0.0.0.0/0");
+	auto ip = addr.begin();
+    ++ip;
+	ASSERT_EQ("1.0.0.0/0", (*ip).str());
+}
+
 TEST(test_cidr_v4, iterator_not_network)
 {
 	std::stringstream etalon;

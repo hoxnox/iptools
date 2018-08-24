@@ -4,7 +4,7 @@ from conans import tools
 class IpToolsConan(NxConanFile):
     name = "iptools"
     description = "Header only library of IP utilities. Uses features of C++11."
-    version = "0.3.2"
+    version = "0.3.3"
     options = {"noop":[True, False]}
     default_options = "noop=False"
     url = "https://github.com/hoxnox/iptools.git"
@@ -12,7 +12,7 @@ class IpToolsConan(NxConanFile):
     settings = "os", "compiler", "build_type", "arch"
 
     def do_source(self):
-        self.retrieve("f1f5c0afdef75a7fb91582ba7e5908d6b8cca143befb59e49691cdeed3337aae",
+        self.retrieve("e33bc997ae798b00ffee96ce6bb087af504005cd03256c4c75154254646af230",
             [
                 'vendor://hoxnox/iptools/iptools-{version}.tar.gz'.format(version=self.version),
                 'https://github.com/hoxnox/iptools/archive/{version}.tar.gz'.format(version=self.version)
