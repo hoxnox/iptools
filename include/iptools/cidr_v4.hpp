@@ -241,7 +241,7 @@ cidr_v4::const_iterator::operator++()
 	if (pos_ < end_)
     {
 		++pos_;
-		while (pos_/0x1000000 == 0)
+		if (pos_/0x1000000 == 0)
 			pos_ = 0x01000000;
     }
 	else

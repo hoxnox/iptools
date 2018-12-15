@@ -125,7 +125,7 @@ TEST(test_lpfst, total_16)
 		 {
 			uint32_t le_addr = le_secpref + j;
 			cidr_v4 addr(le_addr, 32);
-			if (i == 24 || i == 176 || i == 42 || i == 192 || i == 2 || i == 6) 
+			if (i == 24 || i == 176 || i == 42 || i == 192 || i == 2 || i == 6)
 				EXPECT_TRUE(ipset.check(addr)) << addr;
 			else if (i == 28 && j == 2)
 				EXPECT_TRUE(ipset.check(addr)) << addr;
@@ -135,6 +135,245 @@ TEST(test_lpfst, total_16)
 				EXPECT_FALSE(ipset.check(addr)) << addr;
 		 }
 	}
+}
+
+TEST(TestLPFST, remove_leafs)
+{
+	basic_lpfst<std::string> ipset;
+	ipset.insert({"10.0.0.0/8"    }, "a");
+	ipset.insert({"192.168.3.0/24"}, "b");  //         e
+	ipset.insert({"127.0.0.0/24"  }, "c");  //      c    b
+	ipset.insert({"10.0.2.0/24"   }, "d");  //   d         f
+	ipset.insert({"10.0.2.128/25" }, "e");  // a        g
+	ipset.insert({"213.1.2.0/24"  }, "f");  //
+	ipset.insert({"215.1.2.0/24"  }, "g");
+
+	std::string rs;
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("215.1.2.1")), rs));
+	EXPECT_EQ   ("g", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("10.0.0.1")), rs));
+	EXPECT_EQ   ("a", rs);
+
+	ipset.remove({"10.0.0.0/8"});
+	ipset.remove({"215.1.2.0/24"});
+
+	rs.clear();
+	EXPECT_TRUE(ipset.check(ntohl(inet_addr("127.0.0.1")), rs));
+	EXPECT_EQ   ("c", rs);
+
+	rs.clear();
+	EXPECT_FALSE (ipset.check(ntohl(inet_addr("215.1.2.1")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_FALSE (ipset.check(ntohl(inet_addr("215.1.2.2")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_FALSE (ipset.check(ntohl(inet_addr("215.1.2.255")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("215.1.3.2")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_FALSE (ipset.check(ntohl(inet_addr("10.0.0.1")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_FALSE (ipset.check(ntohl(inet_addr("10.0.1.0")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_FALSE (ipset.check(ntohl(inet_addr("10.255.255.255")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("213.1.2.1")), rs));
+	EXPECT_EQ   ("f", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("11.0.0.1")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.1.1")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.2.1")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("192.168.3.1")), rs));
+	EXPECT_EQ   ("b", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.4.1")), rs));
+	EXPECT_EQ   ("", rs);
+}
+
+TEST(TestLPFST, remove_with_child)
+{
+	basic_lpfst<std::string> ipset;
+	ipset.insert({"10.0.0.0/8"	}, "a");
+	ipset.insert({"192.168.3.0/24"}, "b");
+	ipset.insert({"127.0.0.0/24"  }, "c");
+	ipset.insert({"10.0.2.0/24"   }, "d");
+	ipset.insert({"10.0.2.128/25" }, "e");
+	ipset.insert({"213.1.2.0/24"  }, "f");
+	ipset.insert({"215.1.2.0/24"  }, "g");
+
+	std::string rs;
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("192.168.3.1")), rs));
+	EXPECT_EQ   ("b", rs);
+
+	ipset.remove({"192.168.3.0/24"});
+
+	rs.clear();
+	EXPECT_FALSE (ipset.check(ntohl(inet_addr("192.168.3.1")), rs));
+	EXPECT_EQ   ("", rs);
+
+	// other were not affected
+
+	rs.clear();
+	EXPECT_TRUE(ipset.check(ntohl(inet_addr("127.0.0.1")), rs));
+	EXPECT_EQ   ("c", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("215.1.2.1")), rs));
+	EXPECT_EQ   ("g", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("215.1.2.2")), rs));
+	EXPECT_EQ   ("g", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("215.1.2.255")), rs));
+	EXPECT_EQ   ("g", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("215.1.3.2")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("10.0.0.1")), rs));
+	EXPECT_EQ   ("a", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("10.0.1.0")), rs));
+	EXPECT_EQ   ("a", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("10.255.255.255")), rs));
+	EXPECT_EQ   ("a", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("213.1.2.1")), rs));
+	EXPECT_EQ   ("f", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("11.0.0.1")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.1.1")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.2.1")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_FALSE (ipset.check(ntohl(inet_addr("192.168.3.1")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.4.1")), rs));
+	EXPECT_EQ   ("", rs);
+}
+
+TEST(TestLPFST, remove_root)
+{
+	basic_lpfst<std::string> ipset;
+	ipset.insert({"10.0.0.0/8"    }, "a");
+	ipset.insert({"192.168.3.0/24"}, "b");
+	ipset.insert({"127.0.0.0/24"  }, "c");
+	ipset.insert({"10.0.2.0/24"   }, "d");
+	ipset.insert({"10.0.2.128/25" }, "e");
+	ipset.insert({"213.1.2.0/24"  }, "f");
+	ipset.insert({"215.1.2.0/24"  }, "g");
+
+	std::string rs;
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("10.0.2.129")), rs));
+	EXPECT_EQ   ("e", rs);
+
+	ipset.remove({"10.0.2.128/25"});
+
+	rs.clear();
+	EXPECT_TRUE(ipset.check(ntohl(inet_addr("10.0.2.129")), rs));
+	EXPECT_EQ  ("d", rs);
+
+	// other were not affected
+
+	rs.clear();
+	EXPECT_TRUE(ipset.check(ntohl(inet_addr("127.0.0.1")), rs));
+	EXPECT_EQ   ("c", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("215.1.2.1")), rs));
+	EXPECT_EQ   ("g", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("215.1.2.2")), rs));
+	EXPECT_EQ   ("g", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("215.1.2.255")), rs));
+	EXPECT_EQ   ("g", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("215.1.3.2")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("10.0.0.1")), rs));
+	EXPECT_EQ   ("a", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("10.0.1.0")), rs));
+	EXPECT_EQ   ("a", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("10.255.255.255")), rs));
+	EXPECT_EQ   ("a", rs);
+
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("213.1.2.1")), rs));
+	EXPECT_EQ   ("f", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("11.0.0.1")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.1.1")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.2.1")), rs));
+	EXPECT_EQ   ("", rs);
+
+	rs.clear();
+	EXPECT_TRUE(ipset.check(ntohl(inet_addr("192.168.3.1")), rs));
+	EXPECT_EQ  ("b", rs);
+
+	rs.clear();
+	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.4.1")), rs));
+	EXPECT_EQ   ("", rs);
 }
 
 TEST(test_lpfst, internet_blacklist)
@@ -231,4 +470,5 @@ TEST(test_lpfst, internet_blacklist)
 		cur += 100;
 	EXPECT_TRUE(cur == cidr_v4("0.0.0.0/0").end()) << *cur;
 }
+
 
