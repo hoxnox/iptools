@@ -390,6 +390,20 @@ TEST(TestLPFST, remove_root)
 	EXPECT_EQ   ("", rs);
 }
 
+TEST(test_lpfst, size)
+{
+    iptools::basic_lpfst<std::string> lpfst;
+	EXPECT_EQ(0, lpfst.size());
+	lpfst.insert({"10.0.0.0/8"    }, "a");
+	EXPECT_EQ(1, lpfst.size());
+	lpfst.insert({"192.168.3.0/24"}, "b");
+	EXPECT_EQ(2, lpfst.size());
+	lpfst.remove({"192.168.3.0/24"});
+	EXPECT_EQ(1, lpfst.size());
+	lpfst.clear();
+	EXPECT_EQ(0, lpfst.size());
+}
+
 TEST(test_lpfst, internet_blacklist)
 {
 	lpfst inet_bl = internet_blacklist();

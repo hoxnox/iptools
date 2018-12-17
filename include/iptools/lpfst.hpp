@@ -19,7 +19,7 @@ class basic_lpfst
 {
 public:
 
-	basic_lpfst() : root{nullptr}, size(0) {}
+	basic_lpfst() : root_{nullptr}, size_(0) {}
 
 	virtual ~basic_lpfst() { clear(); }
 
@@ -31,33 +31,35 @@ public:
 	basic_lpfst& operator=(const basic_lpfst& copy)
 	{
 		clear();
-		if (!copy.root)
+		if (!copy.root_)
 			return *this;
-		root.reset(new node(copy.root->len, copy.root->prefix, copy.root->data));
-		recurse_copy(copy.root, root);
-		size = copy.size;
+		root_.reset(new node(copy.root_->len, copy.root_->prefix, copy.root_->data));
+		recurse_copy(copy.root_, root_);
+		size_ = copy.size_;
 		return *this;
 	}
 
+	size_t size() const { return size_; }
+
 	void insert(iptools::cidr_v4 addr, T data)
 	{
-		if (!root)
-			root.reset(new node(addr, data));
+		if (!root_)
+			root_.reset(new node(addr, data));
 		else
-			insert(addr, data, root, 0);
-		++size;
+			insert(addr, data, root_, 0);
+		++size_;
 	}
 
 	void remove(const iptools::cidr_v4& addr)
 	{
-		remove(addr, root, 0);
-		--size;
+		remove(addr, root_, 0);
+		--size_;
 	}
 
 	/**@return true if the address belongs any of the inserted CIDRs*/
 	bool check(const iptools::cidr_v4& addr, T& data) const
 	{
-		node*	y	  = root.get();
+		node*	y	  = root_.get();
 		uint8_t  level  = 0;
 		bool	 is_net = addr.is_net();
 		uint32_t addr_i = (uint32_t)addr;
@@ -89,7 +91,7 @@ public:
 	 * @param addr in host byte order*/
 	bool check(const uint32_t addr, T& data) const
 	{
-		node*  y = root.get();
+		node*  y = root_.get();
 		uint8_t  level = 0;
 		uint32_t addr_ = addr;
 		while (y != nullptr)
@@ -112,27 +114,28 @@ public:
 
 	bool empty() const
 	{
-		return !(bool)root;
+		return !(bool)root_;
 	}
 
 	void clear()
 	{
-		walk(root, 0, nullptr,
+		walk(root_, 0, nullptr,
 			[](node_ptr_t& cur, uint8_t level)
 			{
 				cur->left.reset(nullptr);
 				cur->right.reset(nullptr);
 			});
-		root.reset(nullptr);
+		root_.reset(nullptr);
+		size_ = 0;
 	}
 
 	std::string print()
 	{
-		if (!root)
+		if (!root_)
 			return {};
 		std::stringstream ss;
-		ss << root->prefix << " " << root->data;
-		walk(root, 0, [&ss](node_ptr_t& cur, uint8_t level, bool left)
+		ss << root_->prefix << " " << root_->data;
+		walk(root_, 0, [&ss](node_ptr_t& cur, uint8_t level, bool left)
 				{
 					ss << std::endl;
 					for (uint8_t i = 0; i < level; ++i)
@@ -278,8 +281,6 @@ protected:
 			fun_after(cur, level);
 	}
 
-private:
-
 	void recurse_copy(const node_ptr_t& from, node_ptr_t& to)
 	{
 		if (from->right)
@@ -294,8 +295,8 @@ private:
 		}
 	}
 
-	node_ptr_t root{nullptr};
-	size_t  size{0};
+	node_ptr_t root_{nullptr};
+	size_t  size_{0};
 };
 
 // preserve back compatibility
