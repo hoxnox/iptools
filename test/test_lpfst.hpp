@@ -296,6 +296,20 @@ TEST(TestLPFST, remove_with_child)
 	EXPECT_EQ   ("", rs);
 }
 
+TEST(TestLPFST, data_rewrite)
+{
+	basic_lpfst<std::string> ipset;
+	ipset.insert({"10.0.0.0/8"    }, "a");
+	std::string rs;
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("10.0.0.1")), rs));
+	EXPECT_EQ   ("a", rs);
+
+	ipset.insert({"10.0.0.0/8"    }, "b");
+	rs.clear();
+	EXPECT_TRUE (ipset.check(ntohl(inet_addr("10.0.0.1")), rs));
+	EXPECT_EQ   ("b", rs);
+}
+
 TEST(TestLPFST, remove_root)
 {
 	basic_lpfst<std::string> ipset;

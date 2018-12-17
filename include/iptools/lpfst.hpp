@@ -204,7 +204,7 @@ protected:
 
 	void insert(iptools::cidr_v4 addr, T data, node_ptr_t& cur, uint8_t level)
 	{
-		if (len(addr) > cur->len)
+		if (len(addr) >= cur->len)
 			cur->swap(addr, data);
 		if (len(addr) == level)
 			return;
