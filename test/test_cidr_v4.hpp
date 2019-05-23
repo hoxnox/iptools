@@ -27,6 +27,18 @@ TEST(test_cidr_v4, byte_order)
 	EXPECT_EQ(24, addr.mask());
 }
 
+TEST(test_cidr_v4, happy_123_1_1_0)
+{
+	cidr_v4 addr("123.1.1.0/24");
+	EXPECT_TRUE(addr.is_net());
+	EXPECT_EQ(2063663360, (uint32_t)addr);
+	EXPECT_EQ(2063663360, addr.first());
+	EXPECT_EQ(2063663615, addr.last());
+	std::stringstream ss;
+	ss << addr;
+	EXPECT_EQ("123.1.1.0/24", ss.str());
+}
+
 TEST(test_cidr_v4, privateB)
 {
 	cidr_v4 addr("172.16.1.2/12");
