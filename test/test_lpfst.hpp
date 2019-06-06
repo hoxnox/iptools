@@ -56,6 +56,25 @@ TEST(test_lpfst, simple_check_uint32)
 	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.4.1"   ))));
 }
 
+TEST(test_lpfst, keeps_wider_range_data)
+{
+	basic_lpfst<std::string> ipset;
+    std::string rs;
+
+	ipset.insert({"10.0.0.0/8" }, {"a"});
+    EXPECT_TRUE(ipset.check(ntohl(inet_addr("10.0.1.1")), rs));
+    EXPECT_EQ("a", rs);
+    EXPECT_TRUE(ipset.check(ntohl(inet_addr("10.0.0.1")), rs));
+    EXPECT_EQ("a", rs);
+
+	ipset.insert({"10.0.1.0/24"}, {"b"});
+    EXPECT_TRUE(ipset.check(ntohl(inet_addr("10.0.1.1")), rs));
+    EXPECT_EQ("b", rs);
+    EXPECT_TRUE(ipset.check(ntohl(inet_addr("10.0.0.1")), rs));
+    EXPECT_EQ("a", rs);
+}
+
+
 TEST(test_lpfst, empty)
 {
 	lpfst ipset;
