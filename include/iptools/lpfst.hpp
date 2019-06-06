@@ -44,10 +44,12 @@ public:
 	void insert(iptools::cidr_v4 addr, T data)
 	{
 		if (!root_)
+		{
 			root_.reset(new node(addr, data));
-		else
-			insert(addr, data, root_, 0);
-		++size_;
+			size_ = 1;
+			return;
+		}
+		insert(addr, data, root_, 0);
 	}
 
 	void remove(const iptools::cidr_v4& addr)
@@ -209,21 +211,33 @@ protected:
 	{
 		if (len(addr) >= cur->len)
 			cur->swap(addr, data);
+		if (len(addr) == cur->len && ((uint32_t)addr>>(32-cur->len) == cur->prefix>>(32-cur->len)))
+			return;
 		if (len(addr) == level)
 			return;
 		if ((((uint32_t)addr >> (31 - level)) & 1) == 0)
 		{
 			if (!cur->left)
+			{
 				cur->left.reset(new node(addr, data));
+				++size_;
+			}
 			else
+			{
 				insert(addr, data, cur->left, level + 1);
+			}
 		}
 		else
 		{
 			if (!cur->right)
+			{
 				cur->right.reset(new node(addr, data));
+				++size_;
+			}
 			else
+			{
 				insert(addr, data, cur->right, level + 1);
+			}
 		}
 	}
 

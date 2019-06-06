@@ -398,6 +398,8 @@ TEST(test_lpfst, size)
 	EXPECT_EQ(1, lpfst.size());
 	lpfst.insert({"192.168.3.0/24"}, "b");
 	EXPECT_EQ(2, lpfst.size());
+	lpfst.insert({"192.168.3.0/24"}, "b");
+	EXPECT_EQ(2, lpfst.size());
 	lpfst.remove({"192.168.3.0/24"});
 	EXPECT_EQ(1, lpfst.size());
 	lpfst.clear();
