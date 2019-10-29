@@ -18,7 +18,7 @@ project(iptools)
 
 set(iptools_VERSION_MAJOR 0)
 set(iptools_VERSION_MINOR 4)
-set(iptools_VERSION_PATCH 2)
+set(iptools_VERSION_PATCH 3)
 # configuration header
 configure_file(
 	"${PROJECT_SOURCE_DIR}/src/iptools_config.cfg"

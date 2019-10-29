@@ -49,7 +49,7 @@ private:
 };
 
 class cidr_v4::const_iterator
-	: public std::iterator<std::random_access_iterator_tag, cidr_v4, uint64_t>
+	: public std::iterator<std::forward_iterator_tag, cidr_v4, uint64_t>
 {
 public:
 	const_iterator() {}
