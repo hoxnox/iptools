@@ -49,7 +49,7 @@ private:
 };
 
 class cidr_v4::const_iterator
-	: public std::iterator<std::forward_iterator_tag, cidr_v4, uint64_t>
+	: public std::iterator<std::random_access_iterator_tag, cidr_v4, uint64_t>
 {
 public:
 	const_iterator() {}
@@ -61,6 +61,10 @@ public:
 	const_iterator&  operator++();
 	const_iterator&  operator+=(uint32_t n);
 	const_iterator   operator+(uint32_t n);
+	const_iterator   operator--(int);
+	const_iterator&  operator--();
+	const_iterator&  operator-=(uint32_t n);
+	const_iterator   operator-(uint32_t n);
 	cidr_v4          operator*() const;
 	uint64_t         distance(const const_iterator& rhv) const;
 private:
@@ -268,6 +272,49 @@ cidr_v4::const_iterator::operator+(uint32_t n)
 		rs.pos_ = rs.end_;
 		rs.mask_ |= END_FLAG;
 	}
+	return rs;
+}
+
+inline cidr_v4::const_iterator
+cidr_v4::const_iterator::operator--(int)
+{
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+	const_iterator cur = *this;
+	operator--();
+	return cur;
+}
+
+inline cidr_v4::const_iterator&
+cidr_v4::const_iterator::operator--()
+{
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+	uint32_t begin = (pos_>>mask_)<<mask_;
+	if (pos_ > begin)
+    {
+		--pos_;
+		if (pos_/0x1000000 == 0)
+			pos_ = 0x01000000;
+    }
+	return *this;
+}
+
+inline cidr_v4::const_iterator&
+cidr_v4::const_iterator::operator-=(uint32_t n)
+{
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+	return *this = *this - n;
+}
+
+inline cidr_v4::const_iterator
+cidr_v4::const_iterator::operator-(uint32_t n)
+{
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+	const_iterator rs(*this);
+	uint32_t rsbegin = (rs.pos_>>rs.mask_)<<rs.mask_;
+	if (rs.pos_ - rsbegin >= n)
+		rs.pos_ -= n;
+	else
+		rs.pos_ = rsbegin;
 	return rs;
 }
 
