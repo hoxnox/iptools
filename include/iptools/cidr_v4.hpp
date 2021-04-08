@@ -66,7 +66,8 @@ public:
 	const_iterator&  operator-=(uint32_t n);
 	const_iterator   operator-(uint32_t n);
 	cidr_v4          operator*() const;
-	uint64_t         distance(const const_iterator& rhv) const;
+	int64_t          operator-(const const_iterator& rhv) const { return distance(rhv); }
+	int64_t          distance(const const_iterator& rhv) const;
 private:
 	uint32_t pos_;
 	uint32_t end_;
@@ -320,19 +321,24 @@ cidr_v4::const_iterator::operator*() const
 	return cidr_v4(pos_, mask_);
 }
 
-inline uint64_t
-cidr_v4::const_iterator::distance(const const_iterator& rhv) const
-{
+inline int64_t
+cidr_v4::const_iterator::distance(const const_iterator& rhv) const {
 	if (end_ != rhv.end_ || (mask_&127)!=(rhv.mask_&127))
 		return 0;
-	if (pos_ >= rhv.pos_)
-	{
-		if(!(mask_ & END_FLAG))
-			return 1;
-		else
-			return 0;
-	}
-	return static_cast<uint64_t>(rhv.pos_) - pos_ + 1;
+
+	bool lhv_end = mask_ & END_FLAG;
+	bool rhv_end = rhv.mask_ & END_FLAG;
+
+	if (lhv_end && rhv_end)
+		return 0;
+
+	if (lhv_end)
+		return rhv.pos_ - end_ - 1;
+
+	if (rhv_end)
+		return rhv.end_ - pos_ + 1;
+
+	return rhv.pos_ - pos_;
 }
 
 } // namespace
