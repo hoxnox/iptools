@@ -278,7 +278,6 @@ cidr_v4::const_iterator::operator+(uint32_t n)
 inline cidr_v4::const_iterator
 cidr_v4::const_iterator::operator--(int)
 {
-	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 	const_iterator cur = *this;
 	operator--();
 	return cur;
@@ -287,7 +286,6 @@ cidr_v4::const_iterator::operator--(int)
 inline cidr_v4::const_iterator&
 cidr_v4::const_iterator::operator--()
 {
-	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 	uint32_t begin = (pos_>>mask_)<<mask_;
 	if (pos_ > begin)
     {
@@ -301,14 +299,12 @@ cidr_v4::const_iterator::operator--()
 inline cidr_v4::const_iterator&
 cidr_v4::const_iterator::operator-=(uint32_t n)
 {
-	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 	return *this = *this - n;
 }
 
 inline cidr_v4::const_iterator
 cidr_v4::const_iterator::operator-(uint32_t n)
 {
-	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 	const_iterator rs(*this);
 	uint32_t rsbegin = (rs.pos_>>rs.mask_)<<rs.mask_;
 	if (rs.pos_ - rsbegin >= n)
