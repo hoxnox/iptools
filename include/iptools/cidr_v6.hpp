@@ -9,6 +9,15 @@
 
 namespace iptools {
 
+bool
+	check_bit(const std::array<uint8_t, 16>& num, uint8_t bitno);
+
+std::array<uint8_t, 16>
+	set_bit(const std::array<uint8_t, 16>& num, uint8_t bitno, bool value);
+
+std::string
+	print_binary(const std::array<uint8_t, 16>& n, uint8_t mask);
+
 class cidr_v6
 {
 public:
@@ -35,6 +44,11 @@ public:
 	cidr_v6     net() const;
 	/**@brief convert to string*/
 	std::string str(bool nomask = false) const;
+	std::string bstr() const { return print_binary(addr_, mask_); }
+	/**@brief check n'th bit, if 1 returns true, false otherwise*/
+	bool check_bit(uint8_t bitno) const;
+	/**@brief check first n bits to be the same sa in prefix*/
+	bool has_prefix(std::array<uint8_t, 16> prefix, uint8_t len) const;
 
 private:
 	std::array<uint8_t, 16> addr_{{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
@@ -48,6 +62,14 @@ namespace std
 	inline ostream& operator<<(ostream& strm, const iptools::cidr_v6& cidr)
 	{
 		strm << cidr.str();
+		return strm;
+	}
+
+	inline ostream& operator<<(ostream& strm, const std::array<uint8_t, 16>& addr)
+	{
+		char tmp[50];
+		if (inet_ntop(AF_INET6, addr.data(), tmp, sizeof(tmp)) != NULL)
+			strm << tmp;
 		return strm;
 	}
 } // namespace
@@ -197,6 +219,73 @@ cidr_v6::last() const
 	addr[15-i] = ((addr_[15-i]>>bits)<<bits);
 	addr[15] |= (0xFF>>(8-bits));
 	return addr;
+}
+
+inline bool
+check_bit(const std::array<uint8_t, 16>& num, uint8_t bitno)
+{
+	if (bitno >= 128)
+		return false;
+	return (num[15-bitno/8]>>bitno%8)&1 == 1;
+}
+
+inline std::array<uint8_t, 16>
+set_bit(const std::array<uint8_t, 16>& num, uint8_t bitno, bool value)
+{
+	if (bitno >= 128)
+		return {};
+	auto rs = num;
+	if (value)
+		rs[15-bitno/8] |= (1<<bitno%8);
+	else
+		rs[15-bitno/8] &= ~(1<<bitno%8);
+	return rs;
+}
+
+inline std::string
+print_binary(const std::array<uint8_t, 16>& n, uint8_t mask)
+{
+	char rs[129+15+2];
+	rs[sizeof(rs)-1] = 0;
+	rs[0] = '[';
+	rs[mask+mask/8+(mask%8==0?0:1)] = ']';
+	size_t pos = 1;
+	for (size_t i = 0; i < 128; ++i)
+	{
+		if (i == mask)
+			pos++;
+		if (i%8 == 0 && i > 0)
+			rs[pos++] = '\'';
+		rs[pos++] = ((n[i/8]>>(7-i%8))&1) == 1 ? '1' : '0';
+	}
+	return rs;
+}
+
+inline bool
+cidr_v6::check_bit(uint8_t bitno) const
+{
+	return ::check_bit(addr_, bitno);
+}
+
+inline bool
+has_prefix(const std::array<uint8_t, 16>& addr, const std::array<uint8_t, 16>& prefix, uint8_t len)
+{
+	if (len == 0)
+		len = 1;
+	if (len > 128)
+		len = 128;
+	uint8_t i = 0;
+	for (; i < len/8; i++)
+		if (addr[i] != prefix[i])
+			return false;
+	uint8_t shift = 8-len%8;
+	return addr[i]>>shift == prefix[i]>>shift;
+}
+
+inline bool
+cidr_v6::has_prefix(std::array<uint8_t, 16> prefix, uint8_t len) const
+{
+	return ::has_prefix(addr_, prefix, len);
 }
 
 } // namespace

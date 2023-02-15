@@ -91,4 +91,30 @@ TEST(test_cidr_v6, in)
 	EXPECT_TRUE (cidr_v6("::1/24").in(cidr_v6("::0/0")));
 }
 
+TEST(test_cidr_v6, check_bit)
+{
+	auto addr = cidr_v6("800a::f0:5/128"); // 1000000000001010::0000000011110000'0000000000000101
+	for (uint8_t i = 0; i < 128+1; ++i)
+	{
+		if (i == 0 || i== 2 || i == 20 || i == 21 || i == 22 || i == 23 || i == 113 || i == 115 || i == 127)
+		{
+			EXPECT_TRUE (addr.check_bit(i)) << (int)i;
+			continue;
+		}
+		EXPECT_FALSE (addr.check_bit(i)) << (int)i;
+	}
+}
 
+TEST(test_cidr_v6, has_prefix)
+{
+	auto addr = cidr_v6("a000::f0:1/128");
+	EXPECT_TRUE (addr.has_prefix(std::array<uint8_t, 16>{
+			0xa0, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 8));
+	EXPECT_FALSE (addr.has_prefix(std::array<uint8_t, 16>{
+			0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 8));
+	EXPECT_FALSE (addr.has_prefix(std::array<uint8_t, 16>{
+			0xa0, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 16));
+}

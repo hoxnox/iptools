@@ -156,6 +156,28 @@ TEST(test_lpfst, total_16)
 	}
 }
 
+//template<class T> std::string
+//print_binary(T n)
+//{
+//	size_t bitscnt = sizeof(T)*8;
+//	char rs[bitscnt+1];
+//	rs[bitscnt] = 0;
+//	for (size_t i = 0; i < bitscnt; ++i)
+//		rs[i] = ((n>>i)&1) == 1 ? '1' : '0';
+//	return rs;
+//}
+//
+//TEST(TestLPFST, validiti)
+//{
+//	basic_lpfst<std::string> ipset;
+//	for(uint32_t i = 0; i <= 0xffff; ++i)
+//	{
+//		ipset.insert({i<<8, 24}, print_binary(i<<8) + "/24");
+//		ipset.insert({i<<16, 16}, print_binary(i<<16) + "/15");
+//	}
+//	std::cout << ipset.print();
+//}
+
 TEST(TestLPFST, remove_leafs)
 {
 	basic_lpfst<std::string> ipset;
