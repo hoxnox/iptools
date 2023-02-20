@@ -86,7 +86,7 @@ cidr_v6::cidr_v6(std::string str)
 	const auto f = str.find('/');
 	if (f == std::string::npos)
 	{
-		mask_ = 0;
+		mask_ = 128;
 	}
 	else
 	{
@@ -97,7 +97,7 @@ cidr_v6::cidr_v6(std::string str)
 		mask_ = static_cast<uint8_t>(std::atoi(mask.c_str()));
 		if (mask_ > 128)
 		{
-			mask_ = 0;
+			mask_ = 128;
 			return;
 		}
 	}
@@ -248,7 +248,10 @@ print_binary(const std::array<uint8_t, 16>& n, uint8_t mask)
 	char rs[129+15+2];
 	rs[sizeof(rs)-1] = 0;
 	rs[0] = '[';
-	rs[mask+mask/8+(mask%8==0?0:1)] = ']';
+	if (mask == 0)
+		rs[1] = ']';
+	else
+		rs[mask+mask/8+(mask%8==0?0:1)] = ']';
 	size_t pos = 1;
 	for (size_t i = 0; i < 128; ++i)
 	{

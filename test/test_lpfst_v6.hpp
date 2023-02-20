@@ -1,6 +1,7 @@
 /**@author hoxnox <hoxnox@gmail.com>
  * @date 20230215 18:19:26*/
 
+#include "iptools/cidr_v6.hpp"
 #include <iptools/lpfst_v6.hpp>
 #include <fstream>
 
@@ -21,98 +22,64 @@ TEST(test_lpfst_v6, simple_check_sidr)
 	addr = cidr_v6{"2001:830::/32"                }; ipset.insert(addr, addr.bstr());
 	addr = cidr_v6{"fd00:10:130:151::10/127"      }; ipset.insert(addr, addr.bstr());
 	//clang-format on
-	std::cout << ipset.print();
+
+	std::string dbg;
+
+	EXPECT_TRUE (ipset.check(cidr_v6{"2001:320:4002:2000:ab::"  }, dbg)) << dbg;
+	EXPECT_TRUE (ipset.check(cidr_v6{"2001:67c:2204:607::2ffa:0"}, dbg)) << dbg;
+	EXPECT_TRUE (ipset.check(cidr_v6{"2001:808::1"              }, dbg)) << dbg;
+	EXPECT_TRUE (ipset.check(cidr_v6{"2001:838:11::/64"         }, dbg)) << dbg;
+	EXPECT_TRUE (ipset.check(cidr_v6{"fd00:10:130:151::254"     }, dbg)) << dbg;
+	EXPECT_TRUE (ipset.check(cidr_v6{"2801:830::1/64"           }, dbg)) << dbg;
+	EXPECT_TRUE (ipset.check(cidr_v6{"2001:df2:7180::15"        }, dbg)) << dbg;
+	EXPECT_TRUE (ipset.check(cidr_v6{"2001:830:ffff::/120"      }, dbg)) << dbg;
+	EXPECT_TRUE (ipset.check(cidr_v6{"fd00:10:130:151::11"      }, dbg)) << dbg;
+
+	EXPECT_FALSE(ipset.check(cidr_v6{"2001:320:4002:2001/128"   }, dbg)) << dbg;
+	EXPECT_FALSE(ipset.check(cidr_v6{"2001:67c:2204:607::2ffa:1"}, dbg)) << dbg;
+	EXPECT_FALSE(ipset.check(cidr_v6{"2002:808::1"              }, dbg)) << dbg;
+	EXPECT_FALSE(ipset.check(cidr_v6{"2001:837::/64"            }, dbg)) << dbg;
+	EXPECT_FALSE(ipset.check(cidr_v6{"ed00:10:130:151::254"     }, dbg)) << dbg;
+	EXPECT_FALSE(ipset.check(cidr_v6{"2801:831::1/64"           }, dbg)) << dbg;
+	EXPECT_FALSE(ipset.check(cidr_v6{"2001:df2:7180::13"        }, dbg)) << dbg;
+	EXPECT_FALSE(ipset.check(cidr_v6{"2001:830::/31"            }, dbg)) << dbg;
+	EXPECT_FALSE(ipset.check(cidr_v6{"fd00:10:130:151::12"      }, dbg)) << dbg;
+	//std::cout << ipset.print();
 }
 
 TEST(tgest_lpfst_v6, remove_leafs)
 {
 	basic_lpfst_v6<std::string> ipset;
-	for (size_t j = 1; j <= 2; j++)
-	{
-		for (size_t i = 0; i <= 0xff; i++)
-		{
-			in6_addr_t addr{};
-			addr[15-j] = i;
-			//ipset.insert({addr, 128-8}, print_binary(addr));
-		}
-	}
-//	ipset.insert({"1111:1111:1111:0/64" }, "a");
-//	ipset.insert({"1111:1111:1111:0/64" }, "b");   //        e
-//	ipset.insert({"1111:1111:1110:0/48" }, );   //      c   b
-//	ipset.insert({"1111:1111:1110:0/47" }, );   //   d        f
-//	ipset.insert({"1111:1111:1111:0/48" }, );   // a        g
-//	ipset.insert({"1111:1111:1111:0/65" }, "f");   //
-//	ipset.insert({"1111:1111:1111:0/65" }, "g");
-	std::cout << ipset.print();
+	cidr_v6 addr;
 
-	/*
-	std::string rs;
-	EXPECT_TRUE (ipset.check(ntohl(inet_addr("215.1.2.1")), rs));
-	EXPECT_EQ   ("g", rs);
+	//clang-format off
+	addr = cidr_v6{"2001:320:4002:2000::/64"      }; ipset.insert(addr, addr.bstr());  // fd00:10:130:151::254/128 [11111101'00000000'00000000'00010000'00000001'00110000'00000001'01010001'00000000'00000000'00000000'00000000'00000000'00000000'00000010'01010100]
+	addr = cidr_v6{"2001:67c:2204:607::2ffa:0/128"}; ipset.insert(addr, addr.bstr());  // 1  [-] 2001:67c:2204:607::2ffa:0/128 [00100000'00000001'00000110'01111100'00100010'00000100'00000110'00000111'00000000'00000000'00000000'00000000'00101111'11111010'00000000'00000000]
+	addr = cidr_v6{"2001:808::/35"                }; ipset.insert(addr, addr.bstr());  // 2    [-] 2001:df2:7180::14/126 [00100000'00000001'00001101'11110010'01110001'10000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'000101]00
+	addr = cidr_v6{"2001:838::/32"                }; ipset.insert(addr, addr.bstr());  // 3      [+] 2001:320:4002:2000::/64 [00100000'00000001'00000011'00100000'01000000'00000010'00100000'00000000]'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000
+	addr = cidr_v6{"fd00:10:130:151::254/128"     }; ipset.insert(addr, addr.bstr());  // 4        [-] 2001:808::/35 [00100000'00000001'00001000'00001000'000]00000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000
+	addr = cidr_v6{"2801:830::/34"                }; ipset.insert(addr, addr.bstr());  // 5          [-] 2001:830::/34 [00100000'00000001'00001000'00110000'00]000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000
+	addr = cidr_v6{"2001:df2:7180::14/126"        }; ipset.insert(addr, addr.bstr());  // 6            [-] 2001:830::/32 [00100000'00000001'00001000'00110000]'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000
+	addr = cidr_v6{"2001:830::/34"                }; ipset.insert(addr, addr.bstr());  // 7              [-] 2001:838::/32 [00100000'00000001'00001000'00111000]'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000
+	addr = cidr_v6{"2001:830::/32"                }; ipset.insert(addr, addr.bstr());  // 5          [+] 2801:830::/34 [00101000'00000001'00001000'00110000'00]000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000
+	addr = cidr_v6{"fd00:10:130:151::10/127"      }; ipset.insert(addr, addr.bstr());  // 1  [+] fd00:10:130:151::10/127 [11111101'00000000'00000000'00010000'00000001'00110000'00000001'01010001'00000000'00000000'00000000'00000000'00000000'00000000'00000000'0001000]0
+	//clang-format on
 
-	rs.clear();
-	EXPECT_TRUE (ipset.check(ntohl(inet_addr("10.0.0.1")), rs));
-	EXPECT_EQ   ("a", rs);
+	std::string dbg;
 
-	ipset.remove({"10.0.0.0/8"});
-	ipset.remove({"215.1.2.0/24"});
+	ipset.remove(cidr_v6{"2001:320:4002:2000::/64"});
+	EXPECT_FALSE(ipset.check(cidr_v6{"2001:320:4002:2000:ab::"}, dbg)) << dbg;
+	ipset.remove(cidr_v6{"2001:808::/35"});
+	EXPECT_FALSE(ipset.check(cidr_v6{"2001:808::1"}, dbg)) << dbg;
+	ipset.remove(cidr_v6{"2001:838::/32"});
+	EXPECT_FALSE(ipset.check(cidr_v6{"2001:838:11::/64"}, dbg)) << dbg;
 
-	rs.clear();
-	EXPECT_TRUE(ipset.check(ntohl(inet_addr("127.0.0.1")), rs));
-	EXPECT_EQ   ("c", rs);
-
-	rs.clear();
-	EXPECT_FALSE (ipset.check(ntohl(inet_addr("215.1.2.1")), rs));
-	EXPECT_EQ   ("", rs);
-
-	rs.clear();
-	EXPECT_FALSE (ipset.check(ntohl(inet_addr("215.1.2.2")), rs));
-	EXPECT_EQ   ("", rs);
-
-	rs.clear();
-	EXPECT_FALSE (ipset.check(ntohl(inet_addr("215.1.2.255")), rs));
-	EXPECT_EQ   ("", rs);
-
-	rs.clear();
-	EXPECT_FALSE(ipset.check(ntohl(inet_addr("215.1.3.2")), rs));
-	EXPECT_EQ   ("", rs);
-
-	rs.clear();
-	EXPECT_FALSE (ipset.check(ntohl(inet_addr("10.0.0.1")), rs));
-	EXPECT_EQ   ("", rs);
-
-	rs.clear();
-	EXPECT_FALSE (ipset.check(ntohl(inet_addr("10.0.1.0")), rs));
-	EXPECT_EQ   ("", rs);
-
-	rs.clear();
-	EXPECT_FALSE (ipset.check(ntohl(inet_addr("10.255.255.255")), rs));
-	EXPECT_EQ   ("", rs);
-
-	rs.clear();
-	EXPECT_TRUE (ipset.check(ntohl(inet_addr("213.1.2.1")), rs));
-	EXPECT_EQ   ("f", rs);
-
-	rs.clear();
-	EXPECT_FALSE(ipset.check(ntohl(inet_addr("11.0.0.1")), rs));
-	EXPECT_EQ   ("", rs);
-
-	rs.clear();
-	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.1.1")), rs));
-	EXPECT_EQ   ("", rs);
-
-	rs.clear();
-	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.2.1")), rs));
-	EXPECT_EQ   ("", rs);
-
-	rs.clear();
-	EXPECT_TRUE (ipset.check(ntohl(inet_addr("192.168.3.1")), rs));
-	EXPECT_EQ   ("b", rs);
-
-	rs.clear();
-	EXPECT_FALSE(ipset.check(ntohl(inet_addr("192.168.4.1")), rs));
-	EXPECT_EQ   ("", rs);
-	*/
+	EXPECT_TRUE(ipset.check(cidr_v6{"2001:830:0:0:a000::"}, dbg)) << dbg;
+	ipset.remove(cidr_v6{"2001:830::/32"});
+	EXPECT_TRUE(ipset.check(cidr_v6{"2001:830:2000::"}, dbg)) << cidr_v6{"2001:830:2000::"}.bstr();
+	EXPECT_FALSE(ipset.check(cidr_v6{"2001:830:6000::"}, dbg)) << dbg;
+	ipset.remove(cidr_v6{"2001:830::/34"});
+	EXPECT_FALSE(ipset.check(cidr_v6{"2001:830:2000::"}, dbg)) << dbg;
 }
 
 /** the code below helped to make tests

@@ -250,7 +250,7 @@ protected:
 	{
 		if (!cur)
 			return;
-		if (toremove == cur->prefix)
+		if (toremove.has_prefix(cur->prefix, cur->len) && cur->len == toremove.mask())
 		{
 			if (!cur->right && !cur->left)
 			{
