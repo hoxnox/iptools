@@ -136,13 +136,13 @@ public:
 		if (!root_)
 			return {};
 		std::stringstream ss;
-		ss << root_->prefix << " " << root_->data;
+		ss << inet_ntoa(*(struct in_addr*)&root_->prefix) << " " << root_->data;
 		walk(root_, 0, [&ss](node_ptr_t& cur, uint8_t level, bool left)
 				{
-					ss << std::endl;
+					ss << std::endl << (int)level;
 					for (uint8_t i = 0; i < level; ++i)
 						ss << "  ";
-					ss << (left ? "[-] " : "[+] ") << cur->prefix << " " << cur->data;
+					ss << (left ? "[-] " : "[+] ") << inet_ntoa(*(struct in_addr*)&cur->prefix) << " " << cur->data;
 				}, nullptr);
 		return ss.str();
 	}

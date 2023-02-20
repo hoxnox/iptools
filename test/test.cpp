@@ -10,6 +10,7 @@
 #include "test_cidr_v4.hpp"
 #include "test_cidr_v6.hpp"
 #include "test_lpfst.hpp"
+#include "test_lpfst_v6.hpp"
 
 int main(int argc, char *argv[])
 {
