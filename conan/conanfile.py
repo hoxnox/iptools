@@ -8,7 +8,7 @@ class IpToolsConan(ConanFile):
     homepage =  "https://github.com/hoxnox/iptools"
     license = "https://github.com/hoxnox/iptools/blob/master/LICENSE"
     settings = "compiler"
-    version = "0.4.4"
+    version = "0.5.0"
 
     def source(self):
         tools.get(**self.conan_data["sources"][self.version])

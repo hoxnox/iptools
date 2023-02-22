@@ -1,4 +1,4 @@
 sources:
-  "0.4.4":
-    sha256: 7c92222963c700d1b65c06b14aebf5a1b2654a664e1a87b9f5488a41b760ca51
-    url: https://github.com/hoxnox/iptools/archive/0.4.4.tar.gz
+  "0.5.0":
+    sha256: 1e8a471550d18eb1ddfe0d0efadc5e59bcebf9a6db8fa060ade41bcb3d92c60c
+    url: https://github.com/hoxnox/iptools/archive/0.5.0.tar.gz
