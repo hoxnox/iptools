@@ -1,4 +1,7 @@
-from conans import tools, ConanFile
+import os
+
+from conan import tools, ConanFile
+from conan.tools.files import get, copy
 
 class IpToolsConan(ConanFile):
     name = "iptools"
@@ -7,13 +10,15 @@ class IpToolsConan(ConanFile):
     url = "https://github.com/hoxnox/iptools"
     homepage =  "https://github.com/hoxnox/iptools"
     license = "https://github.com/hoxnox/iptools/blob/master/LICENSE"
+    package_type="header-library"
     settings = "compiler"
     version = "0.5.0"
 
     def source(self):
-        tools.get(**self.conan_data["sources"][self.version])
+        get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
     def package(self):
-        include_dir = "{}-{}/include/iptools".format(self.name, self.version)
-        self.copy(pattern="*.hpp", dst="include/iptools", src=include_dir)
+        copy(self, "*.hpp", 
+             src=os.path.join(self.source_folder, "include", "iptools"),
+             dst=os.path.join(self.package_folder, "include", "iptools"))
 
