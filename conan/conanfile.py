@@ -22,3 +22,6 @@ class IpToolsConan(ConanFile):
              src=os.path.join(self.source_folder, "include", "iptools"),
              dst=os.path.join(self.package_folder, "include", "iptools"))
 
+    def package_infp(self):
+        self.cpp_info.includedirs = ["include"]
+
